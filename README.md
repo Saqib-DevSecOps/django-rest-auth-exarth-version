@@ -13,34 +13,46 @@ To install this library, simply run the following command:
 Copy code
 ```
 pip install git+https://github.com/saqib-devops/django-rest-auth-exarth-version.git
+-------------------------OR-------------------------------------
+pip install exarth-rest-auth
 ```
+
 
 ## Usage
 To use this library in your Django project, follow these steps:
-- Add rest_auth_custom to your INSTALLED_APPS in settings.py
+- Add exarth_rest_auth to your INSTALLED_APPS in settings.py
 
 ```python
 INSTALLED_APPS = [
-    'rest_auth',
+    'exarth_rest_auth',
+    'exarth_rest_auth.registration'
 ]
 ```
 
 - Add the library's URLs to your urls.py:
 
 ```python
-path('api/auth/', include('rest_auth_custom.urls')),
+urlpatterns += [
+    re_path(r'^rest-auth/', include('exarth_rest_auth.urls')),
+    re_path(r'^rest-auth/registration/', include('exarth_rest_auth.registration.urls')),
+]
+
 ```
+## JWT Support
 
-- Customize the library's settings in `settings.py` as needed (e.g. email settings for password reset functionality)
+By default django-rest-auth uses Django’s Token-based authentication. If you want to use JWT authentication, follow these steps:
 
-## Customizations
-This library includes the following customizations:
+    Install djangorestframework-jwt
+djangorestframework-jwt is currently the only supported JWT library.
 
-## Additional Features
-This library includes the following additional features:
+The JWT_PAYLOAD_HANDLER and JWT_ENCODE_HANDLER settings are imported from the django-rest-framework-jwt settings object.
+Refer to the library’s documentation for information on using different encoders.
 
-## Contributing
-If you would like to contribute to this library, please fork the repository and submit a pull request.
+Add the following configuration value to your settings file to enable JWT authentication.
 
-## Support
-If you have any issues or questions about this library, please open an issue on this repository or contact
+    REST_USE_JWT = True
+
+By default Token authentication is used 
+
+## Note
+- The remaining features are same as rest auth , the only difference is it support latest version of Django
