@@ -1,5 +1,6 @@
-django-allauth>=0.25.0
-responses>=0.3.0
-flake8==2.4.0
-djangorestframework-jwt>=1.7.2
-djangorestframework>=3.6.4
+coveralls==1.11.1
+django-allauth==0.52.0
+djangorestframework-simplejwt==4.6.0
+flake8==3.8.4
+responses==0.12.1
+unittest-xml-reporting==3.0.4

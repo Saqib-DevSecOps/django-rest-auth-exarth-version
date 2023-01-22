@@ -1,11 +1,10 @@
 import json
 
 from django.conf import settings
-from django.test.client import Client, MULTIPART_CONTENT
-from django.utils.encoding import force_text
+from django.test.client import MULTIPART_CONTENT, Client
+from django.utils.encoding import force_str
+from rest_framework import permissions, status
 
-from rest_framework import status
-from rest_framework import permissions
 
 try:
     from django.urls import reverse
@@ -29,7 +28,7 @@ class APIClient(Client):
         return self.generic('OPTIONS', path, data, content_type, **extra)
 
 
-class TestsMixin(object):
+class TestsMixin:
     """
     base for API tests:
         * easy request calls, f.e.: self.post(url, data), self.get(url)
@@ -49,17 +48,16 @@ class TestsMixin(object):
         # check_headers = kwargs.pop('check_headers', True)
         if hasattr(self, 'token'):
             if getattr(settings, 'REST_USE_JWT', False):
-                kwargs['HTTP_AUTHORIZATION'] = 'JWT %s' % self.token
+                kwargs['HTTP_AUTHORIZATION'] = f'JWT {self.token}'
             else:
-                kwargs['HTTP_AUTHORIZATION'] = 'Token %s' % self.token
+                kwargs['HTTP_AUTHORIZATION'] = f'Token {self.token}'
 
         self.response = request_func(*args, **kwargs)
-        is_json = bool(
-            [x for x in self.response._headers['content-type'] if 'json' in x])
+        is_json = 'application/json' in self.response.get('content-type', '')
 
         self.response.json = {}
         if is_json and self.response.content:
-            self.response.json = json.loads(force_text(self.response.content))
+            self.response.json = json.loads(force_str(self.response.content))
 
         if status_code:
             self.assertEqual(self.response.status_code, status_code)
@@ -83,6 +81,7 @@ class TestsMixin(object):
         self.logout_url = reverse('rest_logout')
         self.password_change_url = reverse('rest_password_change')
         self.register_url = reverse('rest_register')
+        self.no_password_register_url = reverse('no_password_rest_register')
         self.password_reset_url = reverse('rest_password_reset')
         self.user_url = reverse('rest_user_details')
         self.verify_email_url = reverse('rest_verify_email')
@@ -93,13 +92,14 @@ class TestsMixin(object):
         self.fb_connect_url = reverse('fb_connect')
         self.tw_connect_url = reverse('tw_connect')
         self.social_account_list_url = reverse('social_account_list')
+        self.resend_email_url = reverse("rest_resend_email")
 
-    def _login(self):
+    def _login(self, expected_status_code=status.HTTP_200_OK):
         payload = {
-            "username": self.USERNAME,
-            "password": self.PASS
+            'username': self.USERNAME,
+            'password': self.PASS,
         }
-        self.post(self.login_url, data=payload, status_code=status.HTTP_200_OK)
+        self.post(self.login_url, data=payload, status_code=expected_status_code)
 
     def _logout(self):
         self.post(self.logout_url, status=status.HTTP_200_OK)
