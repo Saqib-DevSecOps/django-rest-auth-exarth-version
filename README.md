@@ -38,21 +38,36 @@ urlpatterns += [
 ]
 
 ```
-## JWT Support
+## JWT Support (JSON web token)
 
-By default django-rest-auth uses Django’s Token-based authentication. If you want to use JWT authentication, follow these steps:
+By default dj-rest-auth uses Django’s Token-based authentication. If you want to use JWT authentication, follow these steps:
 
-    Install djangorestframework-jwt
-djangorestframework-jwt is currently the only supported JWT library.
+    pip Install djangorestframework-simplejwt
+djangorestframework-simplejwt is currently the only supported JWT library.
 
-The JWT_PAYLOAD_HANDLER and JWT_ENCODE_HANDLER settings are imported from the django-rest-framework-jwt settings object.
-Refer to the library’s documentation for information on using different encoders.
+Add a simple_jwt auth configuration to the list of authentication classes.
 
-Add the following configuration value to your settings file to enable JWT authentication.
+    REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES':(
+        'exarth_rest_auth.jwt_auth.JWTCookieAuthentication',
+    )
+    }
+Add the following configuration value to your settings file to enable JWT authentication in dj-rest-auth.
 
-    REST_USE_JWT = True
+REST_USE_JWT = True
 
-By default Token authentication is used 
+    Declare what you want the cookie key to be called. If you want to use the refresh token feature, also be sure to set that variable.
+
+JWT_AUTH_COOKIE = 'my-app-auth'
+
+JWT_AUTH_REFRESH_COOKIE = 'my-refresh-token'
+
+
+This example value above will cause dj-rest-auth to return a Set-Cookie header that looks like this:
+
+Set-Cookie: my-app-auth=xxxxxxxxxxxxx; expires=Sat, 28 Mar 2020 18:59:00 GMT; HttpOnly; Max-Age=300; Path=/
+
+If JWT_AUTH_REFRESH_COOKIE is also set, it will also set a comparable cookie for that. JWT_AUTH_COOKIE is also used while authenticating each request against protected views.
 
 ## Note
 - The remaining features are same as rest auth , the only difference is it support latest version of Django
