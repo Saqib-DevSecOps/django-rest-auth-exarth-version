@@ -1,51 +1,56 @@
 from django.conf import settings
 
+from exarth_rest_auth.serializers import JWTSerializer as DefaultJWTSerializer
 from exarth_rest_auth.serializers import (
-    TokenSerializer as DefaultTokenSerializer,
-    JWTSerializer as DefaultJWTSerializer,
-    UserDetailsSerializer as DefaultUserDetailsSerializer,
-    LoginSerializer as DefaultLoginSerializer,
-    PasswordResetSerializer as DefaultPasswordResetSerializer,
+    JWTSerializerWithExpiration as DefaultJWTSerializerWithExpiration,
+)
+from exarth_rest_auth.serializers import LoginSerializer as DefaultLoginSerializer
+from exarth_rest_auth.serializers import (
+    PasswordChangeSerializer as DefaultPasswordChangeSerializer,
+)
+from exarth_rest_auth.serializers import (
     PasswordResetConfirmSerializer as DefaultPasswordResetConfirmSerializer,
-    PasswordChangeSerializer as DefaultPasswordChangeSerializer)
-from .utils import import_callable, default_create_token
+)
+from exarth_rest_auth.serializers import (
+    PasswordResetSerializer as DefaultPasswordResetSerializer,
+)
+from exarth_rest_auth.serializers import TokenSerializer as DefaultTokenSerializer
+from exarth_rest_auth.serializers import (
+    UserDetailsSerializer as DefaultUserDetailsSerializer,
+)
 
-create_token = import_callable(
-    getattr(settings, 'REST_AUTH_TOKEN_CREATOR', default_create_token))
+from .utils import default_create_token, import_callable
+
+
+create_token = import_callable(getattr(settings, 'REST_AUTH_TOKEN_CREATOR', default_create_token))
 
 serializers = getattr(settings, 'REST_AUTH_SERIALIZERS', {})
 
-TokenSerializer = import_callable(
-    serializers.get('TOKEN_SERIALIZER', DefaultTokenSerializer))
+TokenSerializer = import_callable(serializers.get('TOKEN_SERIALIZER', DefaultTokenSerializer))
 
-JWTSerializer = import_callable(
-    serializers.get('JWT_SERIALIZER', DefaultJWTSerializer))
+JWTSerializer = import_callable(serializers.get('JWT_SERIALIZER', DefaultJWTSerializer))
 
-UserDetailsSerializer = import_callable(
-    serializers.get('USER_DETAILS_SERIALIZER', DefaultUserDetailsSerializer)
-)
+JWTSerializerWithExpiration = import_callable(serializers.get('JWT_SERIALIZER_WITH_EXPIRATION', DefaultJWTSerializerWithExpiration))
 
-LoginSerializer = import_callable(
-    serializers.get('LOGIN_SERIALIZER', DefaultLoginSerializer)
-)
+UserDetailsSerializer = import_callable(serializers.get('USER_DETAILS_SERIALIZER', DefaultUserDetailsSerializer))
+
+LoginSerializer = import_callable(serializers.get('LOGIN_SERIALIZER', DefaultLoginSerializer))
 
 PasswordResetSerializer = import_callable(
     serializers.get(
-        'PASSWORD_RESET_SERIALIZER',
-        DefaultPasswordResetSerializer
-    )
+        'PASSWORD_RESET_SERIALIZER', DefaultPasswordResetSerializer,
+    ),
 )
 
 PasswordResetConfirmSerializer = import_callable(
     serializers.get(
-        'PASSWORD_RESET_CONFIRM_SERIALIZER',
-        DefaultPasswordResetConfirmSerializer
-    )
+        'PASSWORD_RESET_CONFIRM_SERIALIZER', DefaultPasswordResetConfirmSerializer,
+    ),
 )
 
 PasswordChangeSerializer = import_callable(
-    serializers.get(
-        'PASSWORD_CHANGE_SERIALIZER',
-        DefaultPasswordChangeSerializer
-    )
+    serializers.get('PASSWORD_CHANGE_SERIALIZER', DefaultPasswordChangeSerializer),
 )
+
+JWT_AUTH_COOKIE = getattr(settings, 'JWT_AUTH_COOKIE', None)
+JWT_AUTH_REFRESH_COOKIE = getattr(settings, 'JWT_AUTH_REFRESH_COOKIE', None)
